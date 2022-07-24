@@ -1,7 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
 import {useNavigate} from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
 
 function Home() {
 	let navigate = useNavigate();
@@ -15,7 +14,6 @@ function Home() {
 	return (
 		<div>
 			THIS IS THE HOME PAGE
-			<Button variant="outline-primary">Primary</Button>{' '}
 			<button onClick={() => {
 				navigate('/login')
 			}}> Login </button>
