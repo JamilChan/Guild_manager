@@ -1,72 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import Axios from 'axios';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import Home from './pages/Home';
+import Profile from './pages/Profile';
+import Login from './pages/Login';
+import Admin from './pages/admin/Home';
+import ErrorPage from './pages/ErrorPage';
+import Navbar from './components/Navbar';
+import PrivateRoute from "./PrivateRoute"
+import AdminRoute from "./AdminRoute"
+import { AuthProvider } from "./contexts/AuthContext"
 
 function App() {
-
-  const [movieName, setMovieName] = useState('')
-  const [review, setReview] = useState('')
-  const [movieReviewList, setMovieList] = useState([])
-
-  const [newReview, setNewReview] = useState('')
-
-  useEffect(() => {
-    Axios.get('http://localhost:3001/api/get').then((response) => {
-      setMovieList(response.data)
-    });
-  }, []);
-
-  const submitReview = () => {
-    Axios.post('http://localhost:3001/api/insert', {
-      movieName: movieName,
-      movieReview: review
-    })
-
-    setMovieList([...movieReviewList, {movieName: movieName, movieReview: review}])
-  }
-
-  const deleteReview = (delMovieName) => {
-    Axios.delete(`http://localhost:3001/api/delete/${delMovieName}`)
-  }
-
-  const updateReview = (movie) => {
-    Axios.put('http://localhost:3001/api/update', {
-      movieName: movie,
-      movieReview: newReview
-    })
-    setNewReview('')
-  }
-
   return (
     <div className="App">
-      <h1>Titel</h1>
+      <div>
+        <Router>
+          <AuthProvider>
+            <Navbar/>
 
-      <div className='form'>
-        <label>NAME1</label>
-        <input type="text" name='name1' onChange={(e) => {
-          setMovieName(e.target.value)
-        }}/>
-        <label>NAME2</label>
-        <input type="text" name='name2' onChange={(e) => {
-          setReview(e.target.value)
-        }}/>
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/profile/:username' element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/admin' element={<AdminRoute><Admin /></AdminRoute>} />
 
-        <button onClick={submitReview}>Submit</button>
-
-        {movieReviewList.map((val) => {
-          return (
-            <div>
-              <h1 key={val.id}>Movie Name: {val.movieName} | Movie Review: {val.movieReview}</h1>
-              <button onClick={() => {deleteReview(val.movieName)}}>Delete</button>
-              <input type="text" id='updateInput' onChange={(e) => {
-                setNewReview(e.target.value)
-              }} />
-              <button onClick={() => {updateReview(val.movieName)}}>Update</button>
-            </div>
-          )
-        })}
+              <Route path="*" element={<ErrorPage />} />
+            </Routes>
+          </AuthProvider>
+        </Router>
       </div>
     </div>
+
   );
 }
 
