@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "react-router": "^6.3.0"
+  }
+}
