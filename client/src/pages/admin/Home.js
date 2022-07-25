@@ -1,8 +1,11 @@
 import React from 'react'
+import Raid from '../../components/admin/Raid';
 
 function Home() {
 	return (
-		<div>ONLY FOR ADMIN EYES</div>
+		<div>
+			<Raid/>
+		</div>
 	)
 }
 
