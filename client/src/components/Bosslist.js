@@ -1,21 +1,22 @@
-import React, {} from 'react'
+import React, {useState} from 'react'
 import {BosslistButton} from '../styles/Bosslist.style';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import BossButton from './BossButton'
 
 function Collapse(props) {
-	const children = props.children;
+	const [children, setChildren] = useState(props.children)
+
+	function addComponent() {
+    setChildren([...children, {name: '', items: []}])
+  }
 
 	return (
 		<Row>
-			<Col sm={2}>
+			<Col sm={3}>
+				{children.map((item, i) => (item != null ? <BossButton key={i}>{item}</BossButton> : null))}
 
-
-
-
-				<BosslistButton image={'/Shriekwing.png'} className="bg-dark text-end">Shriekwing</BosslistButton>
-				<BosslistButton image={'/HuntsmanAltimor.png'} className="bg-dark text-end">Huntsman Altimor</BosslistButton>
-				<BosslistButton className="bg-success text-center mt-1">+</BosslistButton>
+				<BosslistButton className="bg-success text-center mt-1" onClick={addComponent}>+</BosslistButton>
 			</Col>
 			<Col>
 

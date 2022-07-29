@@ -16,7 +16,28 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/api/raidtiers/get', (req, res) => {
-	const sqlSelect = "SELECT * FROM raid_tier;"
+	const sqlSelect = `
+	SELECT
+		raid_tier.id as raidid,
+		raid_tier.name as raidname,
+		bosses.id as bossid,
+		bosses.name as bossname,
+		raid_items.id as itemid,
+		raid_items.name as itemname,
+		raid_items.boss as itemboss,
+		raid_items.item_type as itemtype,
+		raid_items.item_stat as itemstat
+	FROM
+		raid_tier
+	LEFT JOIN
+		bosses
+			ON
+				raid_tier.id=bosses.raid_tier
+	LEFT JOIN
+		raid_items
+			ON
+				bosses.id=raid_items.boss;
+	`
 	db.query(sqlSelect, (err, result) => {
 		res.send(result)
 	})
