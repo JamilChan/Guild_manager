@@ -9,7 +9,6 @@ import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
 function Collapse(props) {
 	const children = props.children;
-	console.log(children);
 	const [raidtiername, setRaidtiername] = useState(children.name)
 
 	const createRaidtier = () => {
@@ -27,7 +26,7 @@ function Collapse(props) {
 	}
 
 	return (
-		<Accordion.Item eventKey={children.id}>
+		<Accordion.Item eventKey={children.name}>
 			<Accordion.Header>
 				<input
 					type="text"

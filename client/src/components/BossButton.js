@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {BosslistButton} from '../styles/Bosslist.style';
 
 
-function Collapse(props) {
+function BossButton(props) {
 	const children = props.children;
 	// const [bossname, setBossname] = useState(children.name)
 
@@ -13,4 +13,4 @@ function Collapse(props) {
 	)
 }
 
-export default Collapse;
+export default BossButton;

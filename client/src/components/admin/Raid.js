@@ -27,7 +27,7 @@ function Raid() {
 				nest[item.raidid]['bosses'][item.bossid] = {name: item.bossname, items: []}
 			}
 
-			if(item.itemid) {nest[item.raidid]['bosses'][item.bossid]['items'][item.itemid] = {name: item.itemname, type: item.itemtype, stat: item.itemstat}}
+			if(item.itemid) {nest[item.raidid]['bosses'][item.bossid]['items'][item.itemid] = {id: item.itemid, name: item.itemname, type: item.itemtype, stat: item.itemstat}}
 
 			return null;
 		})
@@ -44,7 +44,7 @@ function Raid() {
 			<Accordion>
       {raidTiers.map((item, i) => (item != null ? <Collapse key={i}>{item}</Collapse> : null)) }
 			</Accordion>
-			<Button className="w-100" variant="success" onClick={addComponent} text="Call Component">+</Button>
+			<Button className="w-100" variant="success" onClick={addComponent}>+</Button>
 
 		</Container>
 	)

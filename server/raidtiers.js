@@ -23,6 +23,7 @@ app.get('/api/raidtiers/get', (req, res) => {
 		bosses.id as bossid,
 		bosses.name as bossname,
 		raid_items.id as itemid,
+		raid_items.id as itemid,
 		raid_items.name as itemname,
 		raid_items.boss as itemboss,
 		raid_items.item_type as itemtype,
