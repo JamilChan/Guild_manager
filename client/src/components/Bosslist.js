@@ -19,6 +19,10 @@ function Collapse(props) {
 		bosses[data.id].name = data.name;
   }
 
+	const changeBossIndex = (data) => {
+		setBossIndex(data);
+  }
+
 	const changeItem = (data) => {
 		if(data.name) {bosses[bossIndex].items[data.id].name = data.name}
 		if(data.type) {bosses[bossIndex].items[data.id].type = data.type}
@@ -32,7 +36,6 @@ function Collapse(props) {
   }
 
 	function addItem() {
-		console.log(bossIndex);
     setBosses(prevBosses => {
 			const copy = [...prevBosses]
 			copy[bossIndex]?.items.push({id: bosses[bossIndex].items.length, name: '', stat: '', type: 0, new: true})
@@ -43,7 +46,7 @@ function Collapse(props) {
 	return (
 		<Row>
 			<Col sm={3}>
-				{bosses.map((item, i) => (item != null ? <BossButton func={changeBossName} key={i}>{item}</BossButton> : null))}
+				{bosses.map((item, i) => (item != null ? <BossButton inputChange={changeBossName} btnClick={changeBossIndex} key={i}>{item}</BossButton> : null))}
 
 				<BosslistButton className="bg-success text-center mt-1" onClick={addBoss}>+</BosslistButton>
 			</Col>
