@@ -1,14 +1,18 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {BosslistButton} from '../styles/Bosslist.style';
 
 
 function BossButton(props) {
-	const children = props.children;
-	// const [bossname, setBossname] = useState(children.name)
-
 	return (
-		<BosslistButton image={`/${children.name.split(" ").join("")}.png`} className="bg-dark">
-			<input type="text" className=' text-end' defaultValue={children.name} />
+		<BosslistButton image={`/${props.children.name.split(" ").join("")}.png`} className="bg-dark">
+			<input
+				type="text"
+				className='text-end'
+				defaultValue={props.children.name}
+				onChange={(e) => {
+					props.func({id: props.children.id, name: e.target.value});
+				}}
+			/>
 		</BosslistButton>
 	)
 }

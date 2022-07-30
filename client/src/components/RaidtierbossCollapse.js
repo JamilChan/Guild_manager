@@ -8,46 +8,47 @@ import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
 
 function Collapse(props) {
-	const children = props.children;
-	const [raidtiername, setRaidtiername] = useState(children.name)
+	// const children = props.children;
+	const [raidtiername, setRaidtiername] = useState(props.children.name)
+	const getRaidtierObject = React.useRef(null)
+	let raidtier = props.children;
 
-	const createRaidtier = () => {
-		Axios.post('http://localhost:3001/api/raidtiers/create', {
-			raidtiername: raidtiername,
-			// raidtierbosses: raidtierbosses
-		})
-	}
+	// const createRaidtier = () => {
+	// 	console.log(props);
+	// 	// Axios.post('http://localhost:3001/api/raidtiers/create', {
+	// 	// 	raidtiername: raidtiername,
+	// 	// 	// raidtierbosses: raidtierbosses
+	// 	// })
+	// }
 
 	const updateRaidtier = () => {
-		Axios.put('http://localhost:3001/api/raidtiers/update', {
-			raidtiername: raidtiername,
-			// raidtierbosses: raidtierbosses
-		})
+		Axios.put('http://localhost:3001/api/raidtiers/update', raidtier)
 	}
 
 	return (
-		<Accordion.Item eventKey={children.name}>
+		<Accordion.Item eventKey={raidtier.name}>
 			<Accordion.Header>
 				<input
 					type="text"
 					className='w-25'
 					defaultValue={raidtiername}
-					onChange={(e) => {setRaidtiername(e.target.value)}}
+					onChange={(e) => {
+						setRaidtiername(e.target.value);
+					}}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
 				/>
 				<FontAwesomeIcon className='btn btn-success ms-2' icon={faFloppyDisk} onClick={(e) => {
 					e.stopPropagation();
-					if(children.id) {
-						updateRaidtier();
-					} else {
-						createRaidtier();
-					}
+					raidtier.name = raidtiername;
+					raidtier.bosses = getRaidtierObject.current();
+					console.log(raidtier);
+					updateRaidtier();
 				}}/>
 			</Accordion.Header>
 			<Accordion.Body>
-				<Bosslist>{children.bosses}</Bosslist>
+				<Bosslist getRaidtierObject={getRaidtierObject}>{raidtier.bosses}</Bosslist>
 			</Accordion.Body>
 		</Accordion.Item>
 	)

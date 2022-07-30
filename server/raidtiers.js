@@ -44,31 +44,89 @@ app.get('/api/raidtiers/get', (req, res) => {
 	})
 })
 
-app.post('/api/raidtiers/insert', (req, res) => {
-	const raidtierName = req.body.raidtierName;
+app.put('/api/raidtiers/update', (req, res) => {
+	let raidid = req.body.id
+	const raidname = req.body.name
 
-	const sqlInsert = "INSERT INTO raid_tier (name) VALUES (?);"
-	db.query(sqlInsert, [raidtierName], (err, result) => {
-		console.log(err);
-	});
-});
-
-app.delete('/api/delete/:delMovieName', (req, res) => {
-	const movieName = req.params.delMovieName
-	const sqlDelete = "DELETE FROM movie_reviews WHERE movieName = ?;"
-	db.query(sqlDelete, movieName, (err, result) => {
-		if(err) console.log(err);
-	});
+	if(!req.body.new) {
+		const sqlUpdateRaid = "UPDATE raid_tier SET name = ? WHERE id = ?;"
+		db.query(sqlUpdateRaid, [raidname, raidid], (err, result) => {
+			if(err) console.log(err);
+			iterateBoss(req.body, raidid)
+		});
+	} else {
+		const sqlCreateRaid = "INSERT INTO raid_tier SET name = ?"
+		db.query(sqlCreateRaid, [raidname], (err, result) => {
+			if(err) console.log(err);
+			iterateBoss(req.body, result.insertId)
+		})
+	}
 })
 
-app.put('/api/update', (req, res) => {
-	const movieName = req.body.movieName
-	const movieReview = req.body.movieReview
-	const sqlUpdate = "UPDATE movie_reviews SET movieReview = ? WHERE movieName = ?;"
-	db.query(sqlUpdate, [movieReview, movieName], (err, result) => {
-		if(err) console.log(err);
-	});
-})
+
+
+// app.post('/api/raidtiers/insert', (req, res) => {
+// 	const raidtierName = req.body.raidtierName;
+
+// 	const sqlInsert = "INSERT INTO raid_tier (name) VALUES (?);"
+// 	db.query(sqlInsert, [raidtierName], (err, result) => {
+// 		console.log(err);
+// 	});
+// });
+
+// app.delete('/api/delete/:delMovieName', (req, res) => {
+// 	const movieName = req.params.delMovieName
+// 	const sqlDelete = "DELETE FROM movie_reviews WHERE movieName = ?;"
+// 	db.query(sqlDelete, movieName, (err, result) => {
+// 		if(err) console.log(err);
+// 	});
+// })
+
+const iterateBoss = (raid, raidid) => {
+	raid.bosses.map((boss) => {
+		if(boss != null) {
+			const bossid = boss.id;
+			const bossname = boss.name;
+
+			if(!boss.new) {
+				const sqlUpdateBoss = "UPDATE bosses SET name = ? WHERE id = ?;"
+				db.query(sqlUpdateBoss, [bossname, bossid], (err, result) => {
+					if(err) console.log(err);
+					iterateItem(boss, bossid)
+				});
+			} else {
+				const sqlCreateBoss = "INSERT INTO bosses SET name = ?, raid_tier = ?;"
+				db.query(sqlCreateBoss, [bossname, raidid], (err, result) => {
+					if(err) console.log(err);
+					iterateItem(boss, result.insertId)
+				});
+			}
+		}
+	})
+}
+
+const iterateItem = (boss, bossid) => {
+	boss.items.map((item) => {
+		if(item != null) {
+			const itemid = item.id;
+			const itemname = item.name;
+			const itemtype = item.type;
+			const itemstat = item.stat;
+
+			if(!item.new) {
+				const sqlUpdateItem = "UPDATE raid_items SET name = ?, item_type = ?, item_stat = ? WHERE id = ?;"
+				db.query(sqlUpdateItem, [itemname, itemtype, itemstat, itemid], (err, result) => {
+					if(err) console.log(err);
+				});
+			} else {
+				const sqlCreateItem = "INSERT INTO raid_items SET name = ?, item_type = ?, item_stat = ?, boss = ?;"
+				db.query(sqlCreateItem, [itemname, itemtype, itemstat, bossid], (err, result) => {
+					if(err) console.log(err);
+				});
+			}
+		}
+	})
+}
 
 app.listen(3001, () => {
 	console.log('raidtiers, running on port 3001');

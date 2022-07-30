@@ -20,11 +20,11 @@ function Raid() {
 
 		response.data.map((item, i) => {
 			if(!nest[item.raidid]) {
-				nest[item.raidid] = {name: item.raidname, bosses: []}
+				nest[item.raidid] = {id: item.raidid, name: item.raidname, bosses: []}
 			}
 
 			if(!nest[item.raidid]['bosses'][item.bossid] && item.bossid != null) {
-				nest[item.raidid]['bosses'][item.bossid] = {name: item.bossname, items: []}
+				nest[item.raidid]['bosses'][item.bossid] = {id: item.bossid, name: item.bossname, items: []}
 			}
 
 			if(item.itemid) {nest[item.raidid]['bosses'][item.bossid]['items'][item.itemid] = {id: item.itemid, name: item.itemname, type: item.itemtype, stat: item.itemstat}}
@@ -36,7 +36,7 @@ function Raid() {
 	}
 
   function addComponent() {
-    setRaidTiers([...raidTiers, {name: '', bosses: []}])
+    setRaidTiers([...raidTiers, {name: '', bosses: [], new: true}])
   }
 
 	return (
