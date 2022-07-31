@@ -28,7 +28,7 @@ function Raid() {
 				nest[item.raidid]['bosses'][item.bossid] = {id: item.bossid, name: item.bossname, items: []}
 			}
 
-			if(item.itemid) {nest[item.raidid]['bosses'][item.bossid]['items'][item.itemid] = {id: item.itemid, name: item.itemname, type: item.itemtype, stat: item.itemstat}}
+			if(item.itemid) {nest[item.raidid]['bosses'][item.bossid]['items'][item.itemid] = {id: item.itemid, name: item.itemname, type: item.itemtype}}
 
 			return null;
 		})

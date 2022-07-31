@@ -6,4 +6,5 @@ export const BosslistButton = styled(Button)`
   min-width: 250px;
   padding: 2ch;
   border-radius: 0;
+  background-size: cover;
 `;

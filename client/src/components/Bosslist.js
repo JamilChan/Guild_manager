@@ -17,24 +17,18 @@ function Collapse(props) {
 		props.getRaidtierObject.current = () => {return bosses}
 	})
 
+	function addBoss() {
+		const newBoss = {id:bosses.length, name: '', items: [], new: true}
+    setBosses([...bosses, newBoss])
+		props.getRaidtierObject.current = () => {return [...bosses, newBoss]}
+  }
+
 	const changeBossName = (data) => {
 		bosses[data.id].name = data.name;
   }
 
 	const changeBossIndex = (data) => {
 		setBossIndex(data);
-  }
-
-	const changeItem = (data) => {
-		if(data.name) {bosses[bossIndex].items[data.id].name = data.name}
-		if(data.type) {bosses[bossIndex].items[data.id].type = data.type}
-		if(data.stat) {bosses[bossIndex].items[data.id].stat = data.stat}
-  }
-
-	function addBoss() {
-		const newBoss = {id:bosses.length, name: '', items: [], new: true}
-    setBosses([...bosses, newBoss])
-		props.getRaidtierObject.current = () => {return [...bosses, newBoss]}
   }
 
 	const deleteBoss = (id) => {
@@ -45,9 +39,14 @@ function Collapse(props) {
 	function addItem() {
     setBosses(prevBosses => {
 			const copy = [...prevBosses]
-			copy[bossIndex]?.items.push({id: bosses[bossIndex].items.length, name: '', stat: '', type: 0, new: true})
+			copy[bossIndex]?.items.push({id: bosses[bossIndex].items.length, name: '', type: 0, new: true})
 			return copy
 		})
+  }
+
+	const changeItem = (data) => {
+		if(data.name) {bosses[bossIndex].items[data.id].name = data.name}
+		if(data.type) {bosses[bossIndex].items[data.id].type = data.type}
   }
 
 	const deleteItem = (id) => {
@@ -87,7 +86,6 @@ function Collapse(props) {
 							<tr>
 								<th>Name</th>
 								<th>Item Type</th>
-								<th>Item Stat</th>
 								<th>Delete</th>
 							</tr>
 						</thead>

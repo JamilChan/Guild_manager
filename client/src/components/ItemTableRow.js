@@ -12,9 +12,6 @@ function ItemTableRow(props) {
 				<input type="text" defaultValue={props.children.type}  onChange={(e) => {props.func({id: props.children.id, type: e.target.value})}}/>
 			</td>
 			<td>
-				<input type="text" defaultValue={props.children.stat}  onChange={(e) => {props.func({id: props.children.id, stat: e.target.value})}}/>
-			</td>
-			<td>
 				<FontAwesomeIcon className='btn btn-danger ms-2 rounded-0' icon={faX} onClick={(e) => {
 					e.stopPropagation();
 

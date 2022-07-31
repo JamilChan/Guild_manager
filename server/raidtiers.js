@@ -26,8 +26,7 @@ app.get('/api/raidtiers/get', (req, res) => {
 		raid_items.id as itemid,
 		raid_items.name as itemname,
 		raid_items.boss as itemboss,
-		raid_items.item_type as itemtype,
-		raid_items.item_stat as itemstat
+		raid_items.item_type as itemtype
 	FROM
 		raid_tier
 	LEFT JOIN
