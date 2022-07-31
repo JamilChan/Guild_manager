@@ -61,6 +61,7 @@ app.put('/api/raidtiers/update', (req, res) => {
 			iterateBoss(req.body, result.insertId)
 		})
 	}
+	res.status(200).send({success: true})
 })
 
 
@@ -77,6 +78,14 @@ app.put('/api/raidtiers/update', (req, res) => {
 app.delete('/api/raidtiers/delete/:id', (req, res) => {
 	const id = req.params.id
 	const sqlDelete = "DELETE FROM raid_tier WHERE id = ?;"
+	db.query(sqlDelete, id, (err, result) => {
+		if(err) console.log(err);
+	});
+})
+
+app.delete('/api/raidtiers/boss/delete/:id', (req, res) => {
+	const id = req.params.id
+	const sqlDelete = "DELETE FROM bosses WHERE id = ?;"
 	db.query(sqlDelete, id, (err, result) => {
 		if(err) console.log(err);
 	});

@@ -9,11 +9,27 @@ import { faFloppyDisk, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 
 function Collapse(props) {
 	const [raidtiername, setRaidtiername] = useState(props.children.name)
-	const [raidtier] = useState(props.children)
+	const [raidtier, setRaidtier] = useState(props.children)
 	const getRaidtierObject = React.useRef(null)
 
 	const updateRaidtier = () => {
-		Axios.put('http://localhost:3001/api/raidtiers/update', raidtier)
+		Axios.put('http://localhost:3001/api/raidtiers/update', raidtier).then(response => {
+			if(true) { //response.data.success
+				let tempraidtier = raidtier;
+				tempraidtier.new = false;
+
+				tempraidtier.bosses.map(boss => {
+					if(boss) { boss.new = false }
+
+					boss?.items.map(item => {
+						if(item) { item.new = false }
+						return null;
+					})
+					return null
+				})
+				setRaidtier(tempraidtier)
+			}
+		})
 	}
 
 	const deleteRaidtier = (id) => {

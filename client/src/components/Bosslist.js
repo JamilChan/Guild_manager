@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {BosslistButton} from '../styles/Bosslist.style';
+import Axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
@@ -10,6 +11,7 @@ import Button from 'react-bootstrap/Button';
 function Collapse(props) {
 	const [bosses, setBosses] = useState(props.children)
 	const [bossIndex, setBossIndex] = useState(Object.keys(bosses).find((key) => bosses[key] !== undefined))
+	const [rerenderstate, setRerenderstate] = useState(false)
 
 	useEffect(() => {
 		props.getRaidtierObject.current = () => {return bosses}
@@ -35,6 +37,12 @@ function Collapse(props) {
 		props.getRaidtierObject.current = () => {return [...bosses, newBoss]}
   }
 
+	const deleteBoss = (id) => {
+		console.log(id);
+		Axios.delete(`http://localhost:3001/api/raidtiers/boss/delete/${id}`)
+		handleDeleteBoss(id)
+	}
+
 	function addItem() {
     setBosses(prevBosses => {
 			const copy = [...prevBosses]
@@ -43,10 +51,19 @@ function Collapse(props) {
 		})
   }
 
+	const handleDeleteBoss = (id) => {
+		let tempstate = bosses;
+
+		delete tempstate[id]
+
+		setBosses(tempstate)
+		setRerenderstate(!rerenderstate)
+	}
+
 	return (
 		<Row>
 			<Col sm={3}>
-				{bosses.map((item, i) => (item != null ? <BossButton inputChange={changeBossName} btnClick={changeBossIndex} key={i}>{item}</BossButton> : null))}
+				{bosses.map((item, i) => (item != null ? <BossButton inputChange={changeBossName} btnClick={changeBossIndex} deleteClick={deleteBoss} key={i}>{item}</BossButton> : null))}
 
 				<BosslistButton className="bg-success text-center mt-1" onClick={addBoss}>+</BosslistButton>
 			</Col>

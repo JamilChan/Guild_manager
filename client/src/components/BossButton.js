@@ -1,5 +1,7 @@
 import React from 'react'
 import {BosslistButton} from '../styles/Bosslist.style';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faX } from '@fortawesome/free-solid-svg-icons'
 
 
 function BossButton(props) {
@@ -13,6 +15,11 @@ function BossButton(props) {
 					props.inputChange({id: props.children.id, name: e.target.value});
 				}}
 			/>
+			<FontAwesomeIcon className='btn btn-danger ms-2 rounded-0' icon={faX} onClick={(e) => {
+				e.stopPropagation();
+
+				props.deleteClick(props.children.id)
+			}}/>
 		</BosslistButton>
 	)
 }

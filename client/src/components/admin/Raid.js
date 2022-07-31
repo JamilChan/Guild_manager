@@ -40,7 +40,7 @@ function Raid() {
     setRaidtiers([...raidtiers, {id: raidtiers.length, name: '', bosses: [], new: true}])
   }
 
-	const handleDelete = (id) => {
+	const handleDeleteRaidtier = (id) => {
 		let tempstate = raidtiers;
 
 		delete tempstate[id]
@@ -52,7 +52,7 @@ function Raid() {
 	return (
 		<Container>
 			<Accordion>
-      {raidtiers.map((item, i) => (item != null ? <Collapse key={i} handleDelete={handleDelete}>{item}</Collapse> : null)) }
+      {raidtiers.map((item, i) => (item != null ? <Collapse key={i} handleDelete={handleDeleteRaidtier}>{item}</Collapse> : null)) }
 			</Accordion>
 			<Button className="w-100" variant="success" onClick={addComponent}>+</Button>
 
