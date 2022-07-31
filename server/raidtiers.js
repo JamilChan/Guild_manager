@@ -91,6 +91,14 @@ app.delete('/api/raidtiers/boss/delete/:id', (req, res) => {
 	});
 })
 
+app.delete('/api/raidtiers/boss/item/delete/:id', (req, res) => {
+	const id = req.params.id
+	const sqlDelete = "DELETE FROM raid_items WHERE id = ?;"
+	db.query(sqlDelete, id, (err, result) => {
+		if(err) console.log(err);
+	});
+})
+
 const iterateBoss = (raid, raidid) => {
 	raid.bosses.map((boss) => {
 		if(boss != null) {

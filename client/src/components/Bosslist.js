@@ -38,7 +38,6 @@ function Collapse(props) {
   }
 
 	const deleteBoss = (id) => {
-		console.log(id);
 		Axios.delete(`http://localhost:3001/api/raidtiers/boss/delete/${id}`)
 		handleDeleteBoss(id)
 	}
@@ -51,10 +50,24 @@ function Collapse(props) {
 		})
   }
 
+	const deleteItem = (id) => {
+		Axios.delete(`http://localhost:3001/api/raidtiers/boss/item/delete/${id}`)
+		handleDeleteItem(id)
+	}
+
 	const handleDeleteBoss = (id) => {
 		let tempstate = bosses;
 
 		delete tempstate[id]
+
+		setBosses(tempstate)
+		setRerenderstate(!rerenderstate)
+	}
+
+	const handleDeleteItem = (id) => {
+		let tempstate = bosses
+
+		delete tempstate[bossIndex].items[id];
 
 		setBosses(tempstate)
 		setRerenderstate(!rerenderstate)
@@ -75,10 +88,11 @@ function Collapse(props) {
 								<th>Name</th>
 								<th>Item Type</th>
 								<th>Item Stat</th>
+								<th>Delete</th>
 							</tr>
 						</thead>
 						<tbody>
-							{bosses[bossIndex]?.items.map((item, i) => (item != null ? <ItemTableRow func={changeItem} key={i}>{item}</ItemTableRow> : null))}
+							{bosses[bossIndex]?.items.map((item, i) => (item != null ? <ItemTableRow func={changeItem} deleteClick={deleteItem} key={i}>{item}</ItemTableRow> : null))}
 						</tbody>
 					</Table>
 					<Button className="w-100" variant="success" onClick={addItem}>+</Button>
