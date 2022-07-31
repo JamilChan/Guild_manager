@@ -4,16 +4,20 @@ import Axios from 'axios';
 
 import Accordion from 'react-bootstrap/Accordion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
+import { faFloppyDisk, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 
 
 function Collapse(props) {
 	const [raidtiername, setRaidtiername] = useState(props.children.name)
+	const [raidtier] = useState(props.children)
 	const getRaidtierObject = React.useRef(null)
-	let raidtier = props.children;
 
 	const updateRaidtier = () => {
 		Axios.put('http://localhost:3001/api/raidtiers/update', raidtier)
+	}
+
+	const deleteRaidtier = (id) => {
+		Axios.delete(`http://localhost:3001/api/raidtiers/delete/${id}`)
 	}
 
 	return (
@@ -34,8 +38,13 @@ function Collapse(props) {
 					e.stopPropagation();
 					raidtier.name = raidtiername;
 					raidtier.bosses = getRaidtierObject.current();
-					console.log(raidtier);
 					updateRaidtier();
+				}}/>
+				<FontAwesomeIcon className='btn btn-danger ms-2' icon={faTrashCan} onClick={(e) => {
+					e.stopPropagation();
+
+					deleteRaidtier(raidtier.id);
+					props.handleDelete(raidtier.id)
 				}}/>
 			</Accordion.Header>
 			<Accordion.Body>

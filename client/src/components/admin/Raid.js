@@ -7,11 +7,12 @@ import Button from 'react-bootstrap/Button';
 import Collapse from '../RaidtierbossCollapse'
 
 function Raid() {
-	const [raidTiers, setRaidTiers] = useState([])
+	const [raidtiers, setRaidtiers] = useState([])
+	const [rerenderstate, setRerenderstate] = useState(false)
 
 	useEffect(() => {
     Axios.get('http://localhost:3001/api/raidtiers/get').then((response) => {
-      setRaidTiers(nestRaidtier(response))
+      setRaidtiers(nestRaidtier(response))
 		});
   }, []);
 
@@ -36,13 +37,22 @@ function Raid() {
 	}
 
   function addComponent() {
-    setRaidTiers([...raidTiers, {name: '', bosses: [], new: true}])
+    setRaidtiers([...raidtiers, {id: raidtiers.length, name: '', bosses: [], new: true}])
   }
+
+	const handleDelete = (id) => {
+		let tempstate = raidtiers;
+
+		delete tempstate[id]
+
+		setRaidtiers(tempstate)
+		setRerenderstate(!rerenderstate)
+	}
 
 	return (
 		<Container>
 			<Accordion>
-      {raidTiers.map((item, i) => (item != null ? <Collapse key={i}>{item}</Collapse> : null)) }
+      {raidtiers.map((item, i) => (item != null ? <Collapse key={i} handleDelete={handleDelete}>{item}</Collapse> : null)) }
 			</Accordion>
 			<Button className="w-100" variant="success" onClick={addComponent}>+</Button>
 
@@ -50,4 +60,4 @@ function Raid() {
 	)
 }
 
-export default Raid
+export default Raid;

@@ -74,13 +74,13 @@ app.put('/api/raidtiers/update', (req, res) => {
 // 	});
 // });
 
-// app.delete('/api/delete/:delMovieName', (req, res) => {
-// 	const movieName = req.params.delMovieName
-// 	const sqlDelete = "DELETE FROM movie_reviews WHERE movieName = ?;"
-// 	db.query(sqlDelete, movieName, (err, result) => {
-// 		if(err) console.log(err);
-// 	});
-// })
+app.delete('/api/raidtiers/delete/:id', (req, res) => {
+	const id = req.params.id
+	const sqlDelete = "DELETE FROM raid_tier WHERE id = ?;"
+	db.query(sqlDelete, id, (err, result) => {
+		if(err) console.log(err);
+	});
+})
 
 const iterateBoss = (raid, raidid) => {
 	raid.bosses.map((boss) => {
