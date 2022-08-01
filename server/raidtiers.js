@@ -63,17 +63,6 @@ app.put('/api/raidtiers/update', (req, res) => {
 	res.status(200).send({success: true})
 })
 
-
-
-// app.post('/api/raidtiers/insert', (req, res) => {
-// 	const raidtierName = req.body.raidtierName;
-
-// 	const sqlInsert = "INSERT INTO raid_tier (name) VALUES (?);"
-// 	db.query(sqlInsert, [raidtierName], (err, result) => {
-// 		console.log(err);
-// 	});
-// });
-
 app.delete('/api/raidtiers/delete/:id', (req, res) => {
 	const id = req.params.id
 	const sqlDelete = "DELETE FROM raid_tier WHERE id = ?;"
@@ -162,4 +151,63 @@ app.get('/api/item_type/get', (req, res) => {
 	db.query(sqlSelect, (err, result) => {
 		res.send(result)
 	})
+})
+
+app.get('/api/user/characters/get', (req, res) => {
+	let userid = req.query.id
+
+	const sqlSelect = `
+	SELECT
+		characters.id as charid,
+		characters.name as charname,
+		characters.class as charclass,
+		characters.guild as charguild,
+		guilds.name as guildname,
+		classes.name as classname
+	FROM
+		characters
+	LEFT JOIN
+		guilds
+			ON
+				characters.guild = guilds.id
+	LEFT JOIN
+		classes
+			ON
+				characters.class = classes.id
+	WHERE
+		user = ?
+	`
+	db.query(sqlSelect, [userid], (err, result) => {
+		if(err) console.log(err);
+		res.send(result)
+	})
+})
+
+app.get('/api/user/characters/joinguild', (req, res) => {
+	let invitetoken = req.query.invitetoken
+
+	const sqlSelect = `
+	SELECT
+		id,
+		name
+	FROM
+		guilds
+	WHERE
+		invitetoken = ?
+	`
+	db.query(sqlSelect, [invitetoken], (err, result) => {
+		if(err) console.log(err);
+		res.send(result)
+	})
+})
+
+app.put('/api/user/characters/update/guild', (req, res) => {
+	let charid = req.body.charid
+	let guildid = req.body.guildid
+
+	const sqlUpdate = "UPDATE characters SET guild = ? WHERE id = ?;"
+	db.query(sqlUpdate, [guildid, charid], (err, result) => {
+		if(err) console.log(err);
+		res.status(200).send({success: true})
+	});
 })

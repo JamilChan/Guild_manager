@@ -31,12 +31,12 @@ function App() {
 		<Navbar bg="dark" variant="dark" expand="lg">
 			<Container>
 				<Navbar.Brand as={Link} to="/"><img
-              alt=""
-              src={logoimg}
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />{' '}Guild Manager</Navbar.Brand>
+					alt=""
+					src={logoimg}
+					width="30"
+					height="30"
+					className="d-inline-block align-top"
+				/>{' '}Guild Manager</Navbar.Brand>
 				<Navbar.Toggle aria-controls="navbarScroll" />
 				<Navbar.Collapse id="navbarScroll">
 					{user == null ?
@@ -63,9 +63,13 @@ function App() {
 					:
 					<Nav className="d-flex">
 						<Nav.Link as={Link} to={str}>Profile</Nav.Link>
+						<Nav.Link as={Link} to='/characters'>Characters</Nav.Link>
 						<Nav.Link onClick={logout}>logout</Nav.Link>
 					</Nav>
 					}
+					<Nav className="d-flex">
+						<Nav.Link as={Link} to='/invite/qwertyuiop'>PLACEHOLDER Invite Link</Nav.Link>
+					</Nav>
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

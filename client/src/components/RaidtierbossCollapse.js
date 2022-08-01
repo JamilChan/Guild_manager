@@ -14,7 +14,7 @@ function Collapse(props) {
 
 	const updateRaidtier = () => {
 		Axios.put('http://localhost:3001/api/raidtiers/update', raidtier).then(response => {
-			if(response) { //response.data.success
+			if(response) {
 				let tempraidtier = raidtier;
 				tempraidtier.new = false;
 

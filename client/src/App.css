@@ -41,3 +41,103 @@
   background-color: #1eff00 !important;
   background-image: url(./assets/CN.jpg);
 }
+
+.dropdown-menu {
+  padding: 0px !important;
+  border-radius: 0px !important;
+}
+
+.dropdown-toggle {
+  border-radius: 0px !important;
+}
+
+.druid {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-druid-vector.43960391b0b03a656707fe7b9873a526.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.hunter {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-hunter-vector.095639e31b058f024eaf9fa96758cfdb.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.mage {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-mage-vector.f1ed288e03decd9919134a5de08d94d1.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.paladin {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-paladin-vector.9665329a4454328f61097d121f0939df.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.priest {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-priest-vector.d7f94632cf32cb6d4e332549f7c8347a.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.rogue {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-rogue-vector.cc2ea8017b7df7c6d19f37640f627485.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.shaman {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-shaman-vector.d07d941c902b378020a1aa9b857dd5f8.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.warlock {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-warlock-vector.26da6762460b000b91d4d748d8274e35.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.warrior {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-warrior-vector.f346a16523efa8fc66ba0c72b3d8d9b5.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.death-knight {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-death-knight-vector.b4acffabf7e866f1b7bd9cd9e59e3595.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.monk {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-monk-vector.81ff0f1d52de3b292098b613e2b190b9.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.demon-hunter {
+  content: url('https://assets.worldofwarcraft.com/static/components/GameIcon/GameIcon-class-demon-hunter-vector.b1210d9369c8d59a2d0750db65bd044f.png');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
+
+.evoker {
+  content: url('https://m.media-amazon.com/images/M/MV5BMjUxMjE4MTQxMF5BMl5BanBnXkFtZTcwNzc2MDM1NA@@._V1_UY1200_CR125,0,630,1200_AL_.jpg');
+  height: 28px;
+  width: 28px;
+  margin-right: 5px;
+}
