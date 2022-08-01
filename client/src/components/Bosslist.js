@@ -90,7 +90,7 @@ function Collapse(props) {
 							</tr>
 						</thead>
 						<tbody>
-							{bosses[bossIndex]?.items.map((item, i) => (item != null ? <ItemTableRow func={changeItem} deleteClick={deleteItem} key={i}>{item}</ItemTableRow> : null))}
+							{bosses[bossIndex]?.items.map((item, i) => (item != null ? <ItemTableRow itemtypes={props.itemtypes} func={changeItem} deleteClick={deleteItem} key={i}>{item}</ItemTableRow> : null))}
 						</tbody>
 					</Table>
 					<Button className="w-100" variant="success" onClick={addItem}>+</Button>

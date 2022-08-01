@@ -14,7 +14,7 @@ function Collapse(props) {
 
 	const updateRaidtier = () => {
 		Axios.put('http://localhost:3001/api/raidtiers/update', raidtier).then(response => {
-			if(true) { //response.data.success
+			if(response) { //response.data.success
 				let tempraidtier = raidtier;
 				tempraidtier.new = false;
 
@@ -37,7 +37,7 @@ function Collapse(props) {
 	}
 
 	return (
-		<Accordion.Item eventKey={raidtier.name}>
+		<Accordion.Item eventKey={raidtier.id}>
 			<Accordion.Header>
 				<input
 					type="text"
@@ -64,7 +64,7 @@ function Collapse(props) {
 				}}/>
 			</Accordion.Header>
 			<Accordion.Body>
-				<Bosslist getRaidtierObject={getRaidtierObject}>{raidtier.bosses}</Bosslist>
+				<Bosslist itemtypes={props.itemtypes} getRaidtierObject={getRaidtierObject}>{raidtier.bosses}</Bosslist>
 			</Accordion.Body>
 		</Accordion.Item>
 	)

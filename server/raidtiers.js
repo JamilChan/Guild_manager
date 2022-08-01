@@ -130,13 +130,13 @@ const iterateItem = (boss, bossid) => {
 			const itemstat = item.stat;
 
 			if(!item.new) {
-				const sqlUpdateItem = "UPDATE raid_items SET name = ?, item_type = ?, item_stat = ? WHERE id = ?;"
-				db.query(sqlUpdateItem, [itemname, itemtype, itemstat, itemid], (err, result) => {
+				const sqlUpdateItem = "UPDATE raid_items SET name = ?, item_type = ? WHERE id = ?;"
+				db.query(sqlUpdateItem, [itemname, itemtype, itemid], (err, result) => {
 					if(err) console.log(err);
 				});
 			} else {
-				const sqlCreateItem = "INSERT INTO raid_items SET name = ?, item_type = ?, item_stat = ?, boss = ?;"
-				db.query(sqlCreateItem, [itemname, itemtype, itemstat, bossid], (err, result) => {
+				const sqlCreateItem = "INSERT INTO raid_items SET name = ?, item_type = ?, boss = ?;"
+				db.query(sqlCreateItem, [itemname, itemtype, bossid], (err, result) => {
 					if(err) console.log(err);
 				});
 			}
@@ -147,3 +147,19 @@ const iterateItem = (boss, bossid) => {
 app.listen(3001, () => {
 	console.log('raidtiers, running on port 3001');
 });
+
+
+// SHIT I DONT UNDERSTAND YET
+
+app.get('/api/item_type/get', (req, res) => {
+	const sqlSelect = `
+	SELECT
+		id as labelKey,
+		item_type as value
+	FROM
+		item_type
+	`
+	db.query(sqlSelect, (err, result) => {
+		res.send(result)
+	})
+})

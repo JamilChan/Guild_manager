@@ -9,11 +9,16 @@ import Collapse from '../RaidtierbossCollapse'
 function Raid() {
 	const [raidtiers, setRaidtiers] = useState([])
 	const [rerenderstate, setRerenderstate] = useState(false)
+	const [itemtypes, setItemtypes] = useState([])
 
 	useEffect(() => {
     Axios.get('http://localhost:3001/api/raidtiers/get').then((response) => {
       setRaidtiers(nestRaidtier(response))
 		});
+
+		Axios.get('http://localhost:3001/api/item_type/get').then((response) => {
+			setItemtypes(response.data);
+		})
   }, []);
 
 	function nestRaidtier(response) {
@@ -37,7 +42,7 @@ function Raid() {
 	}
 
   function addComponent() {
-    setRaidtiers([...raidtiers, {id: raidtiers.length, name: '', bosses: [], new: true}])
+    setRaidtiers([{id: raidtiers.length, name: '', bosses: [], new: true}, ...raidtiers])
   }
 
 	const handleDeleteRaidtier = (id) => {
@@ -52,7 +57,7 @@ function Raid() {
 	return (
 		<Container>
 			<Accordion>
-      {raidtiers.map((item, i) => (item != null ? <Collapse key={i} handleDelete={handleDeleteRaidtier}>{item}</Collapse> : null)) }
+      {raidtiers.slice(0).reverse().map((item, i) => (item != null ? <Collapse key={i} itemtypes={itemtypes} handleDelete={handleDeleteRaidtier}>{item}</Collapse> : null)) }
 			</Accordion>
 			<Button className="w-100" variant="success" onClick={addComponent}>+</Button>
 
