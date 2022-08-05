@@ -48,7 +48,7 @@ app.post('/register', (req, res) => {
 		if(err) { console.log(err); }
 
 		db.query(
-			'INSERT INTO users (username, password) VALUES (?,?);',
+			'INSERT INTO users (email, password) VALUES (?,?);',
 			[username, hash],
 			(err, res) => {
 				console.log(err);
@@ -74,23 +74,15 @@ const verifyJWT = (req, res, next) => {
 }
 
 app.get('/isUserAuthenticatedPlaceholder', verifyJWT, (req, res) => {
-	res.send('You are Authenticated');
+	// res.send(res.data.d);
 })
-
-app.get('/login', (req, res) => {
-	if(req.session.user) {
-		res.send({loggedIn: true, user: req.session.user})
-	} else {
-		res.send({loggedIn: false})
-	}
-});
 
 app.post('/login', (req, res) => {
 	const username = req.body.username
 	const password = req.body.password
 
 	db.query(
-		'SELECT * FROM users WHERE username = ?;',
+		'SELECT * FROM users WHERE email = ?;',
 		username,
 		(err, result) => {
 			if(err) {
@@ -101,7 +93,9 @@ app.post('/login', (req, res) => {
 				bcrypt.compare(password, result[0].password, (err, response) => {
 					if(response) {
 						const id = result[0].id;
-						const token = jwt.sign({id}, 'placeholder1', {
+						const email = result[0].email;
+						const role = result[0].role;
+						const token = jwt.sign({id:id, email:email, role:role}, 'placeholder1', {
 							expiresIn: 300,
 						})
 						req.session.user = result;

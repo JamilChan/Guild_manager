@@ -6,11 +6,13 @@ import Login from './pages/Login';
 import Admin from './pages/admin/Home';
 import ErrorPage from './pages/ErrorPage';
 import Navbar from './components/Navbar';
-import PrivateRoute from "./PrivateRoute"
-import AdminRoute from "./AdminRoute"
 import JoinGuild from './pages/JoinGuild';
-import { AuthProvider } from "./contexts/AuthContext"
-import BlizzardStuff from './pages/BlizzardStuff';
+import { AuthProvider } from './context/AuthContext'
+
+import AdminRoute from "./privateroutes/AdminRoute"
+import UserRoute from "./privateroutes/UserRoute"
+import NoUserRoute from "./privateroutes/NoUserRoute"
+
 
 function App() {
   return (
@@ -18,18 +20,27 @@ function App() {
       <div>
         <Router>
           <AuthProvider>
-            <Navbar/>
+          <Navbar/>
 
             <Routes>
               <Route path='/' element={<Home />} />
-              <Route path='/profile/:username' element={<PrivateRoute><Profile /></PrivateRoute>} />
-              <Route path='/characters' element={<PrivateRoute><Characters /></PrivateRoute>} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/admin' element={<AdminRoute><Admin /></AdminRoute>} />
-              <Route path='/invite/:invitetoken' element={<PrivateRoute><JoinGuild /></PrivateRoute>} />
-              <Route path='/blizzardstuff' element={<PrivateRoute><BlizzardStuff /></PrivateRoute>} />
+              <Route element={<UserRoute />} >
+                <Route element={<Profile/>} path='/profile/:username' />
+              </Route>
+              <Route element={<UserRoute />} >
+                <Route element={<Characters/>} path='/characters' />
+              </Route>
+              <Route element={<AdminRoute />} >
+                <Route element={<Admin/>} path='/admin' />
+              </Route>
+              <Route element={<UserRoute />} >
+                <Route element={<JoinGuild/>} path='/invite/:invitetoken' />
+              </Route>
+              <Route element={<NoUserRoute />} >
+                <Route element={<Login/>} path='/login' />
+              </Route>
 
-              {/* <Route path="*" element={<ErrorPage />} /> */}
+              <Route path="*" element={<ErrorPage />} />
             </Routes>
           </AuthProvider>
         </Router>

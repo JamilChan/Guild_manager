@@ -1,11 +1,7 @@
-import React, {useState, useEffect} from 'react'
+import React, {useContext} from 'react'
 import logoimg from '../assets/mE.png'
-import {
-  onAuthStateChanged,
-	signOut,
-} from "firebase/auth";
-import { auth } from "../firebase-config";
 import { Link } from "react-router-dom";
+import AuthContext from '../context/AuthContext'
 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -13,19 +9,9 @@ import Navbar from 'react-bootstrap/Navbar';
 
 function App() {
 
-  const [user, setUser] = useState(null);
+  const {user, logoutUser} = useContext(AuthContext);
 
-	useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
-			setUser(currentUser);
-    });
-  })
-
-	const logout = async () => {
-    await signOut(auth);
-  };
-
-	const str = `/profile/${user?.uid}`
+	const str = `/profile/${user?.id}`
 
 	return (
 		<Navbar bg="dark" variant="dark" expand="lg">
@@ -51,7 +37,7 @@ function App() {
 							<Nav.Link as={Link} to='/'>Guilds</Nav.Link>
 						</Nav>
 					}
-					{user?.uid === "s7zP0awIr3frjriqiypTF9TeQ003" &&
+					{user?.role === 'admin' &&
 					<Nav className="d-flex">
 						<Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
 					</Nav>
@@ -64,7 +50,7 @@ function App() {
 					<Nav className="d-flex">
 						<Nav.Link as={Link} to={str}>Profile</Nav.Link>
 						<Nav.Link as={Link} to='/characters'>Characters</Nav.Link>
-						<Nav.Link onClick={logout}>logout</Nav.Link>
+						<Nav.Link onClick={logoutUser}>logout</Nav.Link>
 					</Nav>
 					}
 					<Nav className="d-flex">
