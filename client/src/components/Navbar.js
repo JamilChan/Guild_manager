@@ -70,6 +70,9 @@ function App() {
 					<Nav className="d-flex">
 						<Nav.Link as={Link} to='/invite/qwertyuiop'>PLACEHOLDER Invite Link</Nav.Link>
 					</Nav>
+					<Nav className="d-flex">
+						<Nav.Link as={Link} to='/blizzardstuff'>api testing</Nav.Link>
+					</Nav>
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

@@ -14,28 +14,30 @@ function JoinGuild() {
 	const [options, setOptions] = useState([])
 	const [character, setCharacter] = useState({})
 	const {invitetoken} = useParams();
+	const redirectUriString = encodeURIComponent('http://localhost:3001/oauth/callback');
+	const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 	let navigate = useNavigate();
 
 	useEffect(() => {
 		if(invitetoken) {
 			Axios.get('http://localhost:3001/api/user/characters/joinguild', {params: {invitetoken: invitetoken}}).then(response => {
-				if(response) {
+				if(response.data.length > 0) {
 					setGuild(response.data);
 
-					if(response.data.length > 0) {
-						Axios.get('http://localhost:3001/api/user/characters/get', {params: {id: id}}).then(response => {
-							if(response) {
-								let temparr = []
+					window.location.replace(`https://oauth.battle.net/authorize?client_id=${CLIENT_ID}&scope=wow.profile&redirect_uri=${redirectUriString}&response_type=code`)
+						console.log('res');
+						// if(res.data.length > 0) {
+						// 	const queryString = window.location.search;
+						// 	const urlParams = new URLSearchParams(queryString);
+						// 	const code = urlParams.get('code')
 
-								response.data.map((character) => {
-									temparr.push({labelKey: character.charid, value: character.charname, icon: character.classname.toLowerCase().replace(' ', '-'), style: {'display': 'flex', "backgroundColor":"#d3d3d3", "color": "#FFFFFF"}})
-									return null;
-								})
-
-								setOptions(temparr)
-							}
-						})
-					}
+						// 	// Axios.get('http://localhost:3001/oauth/callback', {params: {code: code}}).then((response) => {
+						// 	// 	const accesstoken = response.data.access_token;
+						// 	// 	Axios.get(`https://eu.api.blizzard.com/profile/user/wow?namespace=profile-eu&locale=en_GB&access_token=${accesstoken}`).then(response => {
+						// 	// 		console.log(response);
+						// 	// 	})
+						// 	// });
+						// }
 				}
 			})
 		}

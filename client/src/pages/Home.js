@@ -2,7 +2,7 @@ import React from 'react';
 import Axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 
-function Home() {
+function Home(props) {
 	let navigate = useNavigate();
 
 	const test = () => {

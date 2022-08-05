@@ -1,8 +1,18 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const mysql = require('mysql');
+const fetch = require('isomorphic-fetch');
+const btoa = require('btoa');
+
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
+const TOKEN_ENDPOINT = 'https://eu.battle.net/oauth/token';
+
+const redirectUri = 'http://localhost:3001/oauth/callback';
+const scopes = ['wow.profile'];
 
 const db = mysql.createPool({
 	host: 'localhost',
@@ -211,3 +221,43 @@ app.put('/api/user/characters/update/guild', (req, res) => {
 		res.status(200).send({success: true})
 	});
 })
+
+//stolen
+
+app.get('/oauth/callback', async (req, res, next) => {
+	let {code} = req.query
+
+	// build headers
+	const basicAuth = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
+	const headers = {
+		authorization: `Basic ${basicAuth}`,
+		'Content-Type': 'application/x-www-form-urlencoded'
+	};
+	// build request body
+	const params = new URLSearchParams();
+	params.append('redirect_uri', redirectUri);
+	params.append('scope', scopes.join(' '));
+	params.append('grant_type', 'authorization_code');
+	params.append('code', code);
+
+	// execute request
+	const requestOptions = {
+			method: 'POST',
+			body: params,
+			headers
+	};
+	const oauthResponse = await fetch(TOKEN_ENDPOINT, requestOptions);
+
+	// handle errors
+	if (!oauthResponse.ok) { // res.status >= 200 && res.status < 300
+		console.log(`Token request failed with "${oauthResponse.statusText}"`);
+		return next(new Error(oauthResponse.statusText));
+	}
+
+	// work with the oauth response
+	const responseData = await oauthResponse.json();
+
+	// STORE ACCESS TOKEN IN DB ON USER WITH TIME. THEN REDIRECT TO THE PAGE WHERE YOU JOIN GUILD. AND THEN MAKE API CALL FOR CHARACTERS
+
+	// res.redirect('http://localhost:3000/');
+});

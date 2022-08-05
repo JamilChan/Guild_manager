@@ -10,6 +10,7 @@ import PrivateRoute from "./PrivateRoute"
 import AdminRoute from "./AdminRoute"
 import JoinGuild from './pages/JoinGuild';
 import { AuthProvider } from "./contexts/AuthContext"
+import BlizzardStuff from './pages/BlizzardStuff';
 
 function App() {
   return (
@@ -26,8 +27,9 @@ function App() {
               <Route path='/login' element={<Login />} />
               <Route path='/admin' element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path='/invite/:invitetoken' element={<PrivateRoute><JoinGuild /></PrivateRoute>} />
+              <Route path='/blizzardstuff' element={<PrivateRoute><BlizzardStuff /></PrivateRoute>} />
 
-              <Route path="*" element={<ErrorPage />} />
+              {/* <Route path="*" element={<ErrorPage />} /> */}
             </Routes>
           </AuthProvider>
         </Router>
