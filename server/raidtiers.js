@@ -11,7 +11,7 @@ const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
 const TOKEN_ENDPOINT = 'https://eu.battle.net/oauth/token';
 
-const redirectUri = 'http://localhost:3001/oauth/callback';
+const redirectUri = 'http://localhost:3001/oauth/accesstoken/get';
 const scopes = ['wow.profile'];
 
 const db = mysql.createPool({
@@ -212,20 +212,56 @@ app.get('/api/user/characters/joinguild', (req, res) => {
 })
 
 app.put('/api/user/characters/update/guild', (req, res) => {
-	let charid = req.body.charid
-	let guildid = req.body.guildid
+	const userid = req.body.userid;
+	const guildid = req.body.guildid;
 
-	const sqlUpdate = "UPDATE characters SET guild = ? WHERE id = ?;"
-	db.query(sqlUpdate, [guildid, charid], (err, result) => {
-		if(err) console.log(err);
-		res.status(200).send({success: true})
-	});
+	req.body.characters.map((char) => {
+		const sqlSelect = `
+		SELECT
+			id
+		FROM
+			characters
+		WHERE
+			user = ?
+				AND
+			wowid = ?
+		`
+		db.query(sqlSelect, [userid, char.id], (err, result) => {
+			if(err) console.log(err);
+
+			if(result.length > 0) {
+				const sqlUpdate = "UPDATE characters SET guild = ? WHERE wowid = ?;"
+				db.query(sqlUpdate, [guildid, char.id], (err, result) => {
+					if(err) console.log(err);
+					res.status(200).send({success: true})
+				});
+			} else {
+				const sqlSelectClasses = `
+				SELECT
+					id
+				FROM
+					classes
+				WHERE
+					name = ?;
+				`
+				db.query(sqlSelectClasses, [char.playable_class.name], (err, result) => {
+					const sqlCreate = "INSERT INTO characters (user, name, class, guild, wowid) VALUES (?, ?, ?, ?, ?)"
+					db.query(sqlCreate, [userid, char.name, result[0].id, guildid, char.id], (err, result) => {
+						if(err) console.log(err);
+						res.send(result);
+					})
+				})
+			}
+		})
+	})
+
+
 })
 
 //stolen
 
-app.get('/oauth/callback', async (req, res, next) => {
-	let {code} = req.query
+app.get('/oauth/accesstoken/get', async (req, res, next) => {
+	let {code, state} = req.query;
 
 	// build headers
 	const basicAuth = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
@@ -242,9 +278,9 @@ app.get('/oauth/callback', async (req, res, next) => {
 
 	// execute request
 	const requestOptions = {
-			method: 'POST',
-			body: params,
-			headers
+		method: 'POST',
+		body: params,
+		headers
 	};
 	const oauthResponse = await fetch(TOKEN_ENDPOINT, requestOptions);
 
@@ -257,7 +293,37 @@ app.get('/oauth/callback', async (req, res, next) => {
 	// work with the oauth response
 	const responseData = await oauthResponse.json();
 
-	// STORE ACCESS TOKEN IN DB ON USER WITH TIME. THEN REDIRECT TO THE PAGE WHERE YOU JOIN GUILD. AND THEN MAKE API CALL FOR CHARACTERS
+	const sqlUpdate = "UPDATE users SET bnetaccesstoken = ? WHERE id = ?;"
+	db.query(sqlUpdate, [responseData.access_token, state], (err, result) => {
+		if(err) console.log(err);
+	});
 
-	// res.redirect('http://localhost:3000/');
+	// STORE ACCESS TOKEN IN DB ON USER WITH TIME. THEN REDIRECT TO THE PAGE WHERE YOU JOIN GUILD. AND THEN MAKE API CALL FOR CHARACTERS
+	res.redirect(`http://localhost:3000/invite`);
+});
+
+app.get('/api/user/bnet/characters/get', async (req, res) => {
+	let {id} = req.query
+
+	const sqlSelect = `
+	SELECT
+		bnetaccesstoken as accesstoken
+	FROM
+		users
+	WHERE
+		id = ?;
+	`
+	db.query(sqlSelect, [id], async (err, result) => {
+		const accesstoken = result[0].accesstoken
+		const charactersResponse = await fetch(`https://eu.api.blizzard.com/profile/user/wow?namespace=profile-eu&locale=en_GB&access_token=${accesstoken}`)
+
+		if (!charactersResponse.ok) { // res.status >= 200 && res.status < 300
+			console.log(`Token request failed with "${charactersResponse.statusText}"`);
+			return next(new Error(charactersResponse.statusText));
+		}
+
+		const responseData = await charactersResponse.json();
+
+		res.json(responseData);
+	})
 });

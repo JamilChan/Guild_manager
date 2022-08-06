@@ -8,6 +8,7 @@ import ErrorPage from './pages/ErrorPage';
 import Navbar from './components/Navbar';
 import JoinGuild from './pages/JoinGuild';
 import { AuthProvider } from './context/AuthContext'
+import Invite from './redirect/Invite';
 
 import AdminRoute from "./privateroutes/AdminRoute"
 import UserRoute from "./privateroutes/UserRoute"
@@ -40,7 +41,12 @@ function App() {
                 <Route element={<Login/>} path='/login' />
               </Route>
 
-              <Route path="*" element={<ErrorPage />} />
+
+
+              <Route element={<UserRoute />} >
+                <Route element={<Invite/>} path='/invite' />
+              </Route>
+              {/* <Route path="*" element={<ErrorPage />} /> */}
             </Routes>
           </AuthProvider>
         </Router>
