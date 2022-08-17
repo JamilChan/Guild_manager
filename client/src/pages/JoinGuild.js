@@ -1,121 +1,61 @@
-import React, {useState, useEffect, useContext} from 'react'
-import Axios from 'axios';
-import {useNavigate, useParams} from 'react-router-dom'
+import React, {useContext} from 'react'
 import AuthContext from '../context/AuthContext'
-
-import Container from 'react-bootstrap/Container';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import Row from 'react-bootstrap/Row';
+import CharacterlistContext from '../context/CharacterlistContext'
+import ListOfCharacters from '../components/bnet/ListOfCharacters'
+import Axios from 'axios';
+import {useNavigate} from 'react-router-dom'
+import {useQuery} from '@tanstack/react-query'
+import {useParams} from 'react-router-dom'
 
 function JoinGuild() {
+	let navigate = useNavigate();
 	const {invitetoken} = useParams();
 
-	const [guild, setGuild] = useState([])
-	const [wowAccounts, setWowAccounts] = useState([])
-	const [submitList, setSubmitList] = useState([])
-
-	const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
-
-	let navigate = useNavigate();
 	let {user} = useContext(AuthContext)
+	const {setGuild, setCardtitel, setWowAccounts, setEmptyMessage} = useContext(CharacterlistContext)
 
-	useEffect(() => {
+	const {
+		data: testdata,
+		isLoading,
+		isError,
+		error,
+  } = useQuery(["joinguild"], () => {
+		setEmptyMessage('This invite link does not exist')
+
 		Axios.get('http://localhost:3001/api/user/characters/joinguild', {params: {invitetoken: invitetoken}}).then(response => {
-			if(response.data.length > 0) {
-				setGuild(response.data);
+			if(response.data.length <= 0) return;
 
-				if(localStorage.getItem('invitetoken')) {
-					localStorage.removeItem('invitetoken')
+			setGuild(response.data);
+			setCardtitel(`Join ${response.data[0].name}?`)
 
-					Axios.get('http://localhost:3001/api/user/bnet/characters/get', {params: {id: user.id}}).then(response => {
-						setWowAccounts(response.data.wow_accounts)
-					})
-				}
-			}
+			Axios.get('http://localhost:3001/api/user/bnet/characters/get', {params: {id: user.id}}).then(response => {
+				setWowAccounts(response.data.wow_accounts)
+			}).catch(error => {
+				setWowAccounts([])
+				console.log(error.response.data);
+			})
 		})
-	}, [])
+  });
 
-	const bnetlogin = () => {
-		const redirectUriString = encodeURIComponent(`http://localhost:3001/oauth/accesstoken/get`);
-		localStorage.setItem('invitetoken', invitetoken)
-		// PLACEHOLDER STATE UNTILL I FIND A REAL SOLUTION
-		window.location.replace(`https://oauth.battle.net/authorize?client_id=${CLIENT_ID}&scope=wow.profile&redirect_uri=${redirectUriString}&response_type=code&state=${user.id}`)
-	}
-
-	const addCharacterToSubmitList = (character) => {
-		const exists = submitList.includes(character)
-
-		if (exists) {
-			setSubmitList(submitList.filter((char) => { return char !== character }))
-		} else {
-			setSubmitList([...submitList, character])
-		}
-	}
-
-  const handleSubmit = () => {
-		console.log(submitList);
-		console.log(guild);
+	const submitClick = (submitList, guild) => {
 		Axios.put('http://localhost:3001/api/user/characters/update/guild', {characters: submitList, userid: user.id, guildid: guild[0].id}).then(response => {
-			if(response) {
-				navigate('/characters', { replace: true });
-			}
+			if(!response) return;
+
+			navigate('/characters', { replace: true });
 		})
 	}
+	console.log(testdata, isLoading);
+
+	if (isLoading) {
+		return <h1> Loading...</h1>;
+	}
+
+	if (isError) {
+    return <h1>Error: {error.message}</h1>
+  }
 
 	return (
-		<div>
-			<Container>
-				{guild.length > 0 ?
-				<Card>
-					<Card.Body>
-						<Card.Title>Join {guild[0].name}?</Card.Title>
-
-						{ wowAccounts.length > 0 &&
-							<Row xs={1} md={2} lg={3} className="g-4">
-								{
-									wowAccounts.map((account) => {
-										return (
-											account.characters.map((character, i) => {
-												if(character.level === 60) {
-													return (
-														<Card
-															className='bg-secondary'
-															key={i}
-															onClick={() => {
-																addCharacterToSubmitList(character)
-															}}
-														>
-															<Card.Body>
-																<Card.Title>{character.name}</Card.Title>
-																<Card.Subtitle>{character.realm.name}</Card.Subtitle>
-
-															</Card.Body>
-														</Card>
-													)
-												}
-
-												return null;
-											})
-										)
-									})
-								}
-							</Row>
-						}
-
-						{ wowAccounts.length === 0 &&
-							<Button className='btn-alert' onClick={bnetlogin}>Get List of Characters</Button>
-						}
-					</Card.Body>
-					{	submitList.length > 0 &&
-						<Button className='btn-success rounded-0' onClick={handleSubmit}>Add to guild</Button>
-					}
-				</Card>
-				:
-				'This invite link does not exist'
-				}
-			</Container>
-		</div>
+		<ListOfCharacters submitClick={submitClick}></ListOfCharacters>
 	)
 }
 

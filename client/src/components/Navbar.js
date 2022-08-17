@@ -34,7 +34,7 @@ function App() {
 						navbarScroll
 						>
 							<Nav.Link as={Link} to='/'>Loot</Nav.Link>
-							<Nav.Link as={Link} to='/'>Guilds</Nav.Link>
+							<Nav.Link as={Link} to='/guild'>Guilds</Nav.Link>
 						</Nav>
 					}
 					{user?.role === 'admin' &&

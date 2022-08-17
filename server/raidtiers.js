@@ -25,6 +25,47 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+const getTime = () => {
+	return new Date().toISOString().slice(0, 19).replace('T', ' ');
+}
+
+const getAccesstoken = (userid, callback) => {
+	const sqlSelect = `
+	SELECT
+		bnetaccesstoken
+	FROM
+		users
+	WHERE
+		id = ?;
+	`
+	db.query(sqlSelect, [userid], (err, result) => {
+		if(err) console.log(err);
+		callback(result[0].bnetaccesstoken)
+	})
+}
+
+const guildExist = (guildname, guildserver, res, callback) => {
+	const sqlSelect = `
+	SELECT
+		id
+	FROM
+		guilds
+	WHERE
+		name = ?
+			AND
+		server = ?;
+	`
+	db.query(sqlSelect, [guildname,guildserver], async (err, result) => {
+		if(err) console.log(err);
+		if(result[0] == null) {
+			callback(null)
+		} else {
+			console.log('yep');
+			res.status(300).send('Guild Already Exists')
+		}
+	})
+}
+
 app.get('/api/raidtiers/get', (req, res) => {
 	const sqlSelect = `
 	SELECT
@@ -126,7 +167,6 @@ const iterateItem = (boss, bossid) => {
 			const itemid = item.id;
 			const itemname = item.name;
 			const itemtype = item.type;
-			const itemstat = item.stat;
 
 			if(!item.new) {
 				const sqlUpdateItem = "UPDATE raid_items SET name = ?, item_type = ? WHERE id = ?;"
@@ -254,8 +294,6 @@ app.put('/api/user/characters/update/guild', (req, res) => {
 			}
 		})
 	})
-
-
 })
 
 //stolen
@@ -293,12 +331,11 @@ app.get('/oauth/accesstoken/get', async (req, res, next) => {
 	// work with the oauth response
 	const responseData = await oauthResponse.json();
 
-	const sqlUpdate = "UPDATE users SET bnetaccesstoken = ? WHERE id = ?;"
-	db.query(sqlUpdate, [responseData.access_token, state], (err, result) => {
+	const sqlUpdate = "UPDATE users SET bnetaccesstoken = ?, bnetexpiration = ? WHERE id = ?;"
+	db.query(sqlUpdate, [responseData.access_token, getTime(), state], (err, result) => {
 		if(err) console.log(err);
 	});
 
-	// STORE ACCESS TOKEN IN DB ON USER WITH TIME. THEN REDIRECT TO THE PAGE WHERE YOU JOIN GUILD. AND THEN MAKE API CALL FOR CHARACTERS
 	res.redirect(`http://localhost:3000/invite`);
 });
 
@@ -319,11 +356,114 @@ app.get('/api/user/bnet/characters/get', async (req, res) => {
 
 		if (!charactersResponse.ok) { // res.status >= 200 && res.status < 300
 			console.log(`Token request failed with "${charactersResponse.statusText}"`);
-			return next(new Error(charactersResponse.statusText));
+			return res.status(400).json({error: charactersResponse.statusText});
 		}
 
 		const responseData = await charactersResponse.json();
 
 		res.json(responseData);
+	})
+});
+
+app.get('/api/user/guilds/get', (req, res) => {
+	let {userid} = req.query
+
+	const sqlSelect = `
+	SELECT
+		guilds.id as guildid,
+		guilds.name as guildname,
+		characters.id as charid,
+		characters.name as charname
+	FROM
+		characters
+	LEFT JOIN
+		guilds
+			ON
+				guilds.id=characters.guild
+	WHERE
+		characters.user = ?;
+	`
+	db.query(sqlSelect, [userid], (err, result) => {
+		if(err) console.log(err);
+		let nest = []
+
+		result.map((char) => {
+			if(!nest[char.guildid]) {
+				nest[char.guildid] = {id: char.guildid, name: char.guildname, characters: []}
+			}
+
+			if(!nest[char.guildid]['characters'][char.charid] && char.charid != null) {
+				nest[char.guildid]['characters'][char.charid] = {id: char.charid, name: char.charname}
+			}
+
+			return null;
+		})
+
+		res.send(nest);
+	})
+});
+
+app.get('/api/guild/create/permission/check', (req, res, next) => {
+	let {userid, guildname, guildserver} = req.query
+
+
+	guildExist(guildname, guildserver, res, () => {
+		getAccesstoken(userid, async (accesstoken) => {
+			const charactersResponse = await fetch(`https://eu.api.blizzard.com/profile/user/wow?namespace=profile-eu&locale=en_GB&access_token=${accesstoken}`)
+			if (!charactersResponse.ok) { // res.status >= 200 && res.status < 300
+				res.status(400).json({error: 'err.message'});
+			}
+			const characterResponseData = await charactersResponse?.json();
+
+			const guildResponse = await fetch(`https://eu.api.blizzard.com/data/wow/guild/${guildserver}/${guildname}/roster?namespace=profile-eu&locale=en_GB&access_token=${accesstoken}`)
+			if (!guildResponse.ok) { // res.status >= 200 && res.status < 300
+				await res.status(400).json({error: 'err.message'}); // TEMP HERE FIDDLING WITH ERRORS
+			}
+			const guildResponseData = await guildResponse?.json();
+
+			const allowedchar = characterResponseData?.wow_accounts.some(accounts => {
+				return accounts.characters.some(char => {
+					if(char.realm.slug === guildserver.toLowerCase()) {
+						return guildResponseData.members.find(member => {
+							return member.character.id === char.id && member.rank <= 5
+						})
+					}
+				})
+			})
+
+			res.send(allowedchar)
+		})
+	})
+});
+
+app.get('/api/user/tokeninfo', (req, res) => {
+	let {userid} = req.query
+
+	const sqlSelect = `
+	SELECT
+		DATE_FORMAT(bnetexpiration, '%Y-%m-%d %H:%i:%s') as bnetexpiration
+	FROM
+		users
+	WHERE
+		id = ?;
+	`
+	db.query(sqlSelect, [userid], async (err, result) => {
+		if(err) console.log(err);
+		res.send(result);
+	})
+})
+
+app.post('/api/guild/create', (req, res) => {
+	const name = req.body.guildname
+	const server = req.body.guildserver
+
+	const sqlInsert = `
+	INSERT INTO
+		guilds (name, server)
+	VALUES (?,?);
+	`
+	db.query(sqlInsert, [name, server], async (err, result) => {
+		if(err) console.log(err);
+		res.send(result);
 	})
 });
