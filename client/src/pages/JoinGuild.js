@@ -14,28 +14,28 @@ function JoinGuild() {
 	let {user} = useContext(AuthContext)
 	const {setGuild, setCardtitel, setWowAccounts, setEmptyMessage} = useContext(CharacterlistContext)
 
-	const {
-		data: testdata,
-		isLoading,
-		isError,
-		error,
-  } = useQuery(["joinguild"], () => {
+	const { data: guilddata } = useQuery(['guild'], () => {
 		setEmptyMessage('This invite link does not exist')
+		return Axios.get('http://localhost:3001/api/user/characters/joinguild', {params: {invitetoken: invitetoken}}).then(response => response.data)
+	})
 
-		Axios.get('http://localhost:3001/api/user/characters/joinguild', {params: {invitetoken: invitetoken}}).then(response => {
-			if(response.data.length <= 0) return;
+	const { isLoading, isError, error } = useQuery(
+		['characters', guilddata],
+		() => {
+			if(guilddata.length <= 0) return;
 
-			setGuild(response.data);
-			setCardtitel(`Join ${response.data[0].name}?`)
+			setGuild(guilddata);
+			setCardtitel(`Join ${guilddata[0].name}?`)
 
-			Axios.get('http://localhost:3001/api/user/bnet/characters/get', {params: {id: user.id}}).then(response => {
+			return Axios.get('http://localhost:3001/api/user/bnet/characters/get', {params: {id: user.id}}).then(response => {
 				setWowAccounts(response.data.wow_accounts)
+				return response.data;
 			}).catch(error => {
 				setWowAccounts([])
 				console.log(error.response.data);
 			})
-		})
-  });
+		}
+	)
 
 	const submitClick = (submitList, guild) => {
 		Axios.put('http://localhost:3001/api/user/characters/update/guild', {characters: submitList, userid: user.id, guildid: guild[0].id}).then(response => {
@@ -44,7 +44,6 @@ function JoinGuild() {
 			navigate('/characters', { replace: true });
 		})
 	}
-	console.log(testdata, isLoading);
 
 	if (isLoading) {
 		return <h1> Loading...</h1>;
